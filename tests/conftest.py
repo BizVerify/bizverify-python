@@ -16,11 +16,11 @@ def mock_api():
 
 @pytest.fixture
 def sync_client():
-    client = SyncHttpClient(base_url=BASE, api_key="test-key", token="test-token", max_retries=0)
+    client = SyncHttpClient(base_url=BASE, api_key="test-key", max_retries=0)
     yield client
     client.close()
 
 
 @pytest.fixture
 def async_client():
-    return AsyncHttpClient(base_url=BASE, api_key="test-key", token="test-token", max_retries=0)
+    return AsyncHttpClient(base_url=BASE, api_key="test-key", max_retries=0)

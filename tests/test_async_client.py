@@ -14,8 +14,8 @@ BASE = "https://api.bizverify.co"
 async def test_async_successful_get():
     with respx.mock(base_url=BASE) as mock:
         mock.get("/v1/account").mock(return_value=httpx.Response(200, json={"id": "123"}))
-        client = AsyncHttpClient(base_url=BASE, api_key="k", token="t", max_retries=0)
-        result = await client.request("GET", "/v1/account", auth="jwt")
+        client = AsyncHttpClient(base_url=BASE, api_key="k", max_retries=0)
+        result = await client.request("GET", "/v1/account", auth="api_key")
         assert result == {"id": "123"}
         await client.close()
 
@@ -23,9 +23,9 @@ async def test_async_successful_get():
 @pytest.mark.asyncio
 async def test_async_204_returns_none():
     with respx.mock(base_url=BASE) as mock:
-        mock.delete("/v1/account").mock(return_value=httpx.Response(204))
-        client = AsyncHttpClient(base_url=BASE, token="t", max_retries=0)
-        result = await client.request("DELETE", "/v1/account", body={"password": "x"}, auth="jwt")
+        mock.delete("/v1/account/keys/k1").mock(return_value=httpx.Response(204))
+        client = AsyncHttpClient(base_url=BASE, api_key="k", max_retries=0)
+        result = await client.request("DELETE", "/v1/account/keys/k1", auth="api_key")
         assert result is None
         await client.close()
 
@@ -66,3 +66,20 @@ async def test_async_retry_on_500():
 async def test_async_context_manager():
     async with AsyncHttpClient(base_url=BASE) as client:
         assert isinstance(client, AsyncHttpClient)
+
+
+@pytest.mark.asyncio
+async def test_async_last_response_meta():
+    headers = {
+        "x-credits-remaining": "42",
+        "x-credits-charged": "2",
+    }
+    with respx.mock(base_url=BASE) as mock:
+        mock.get("/v1/test").mock(return_value=httpx.Response(200, json={}, headers=headers))
+        client = AsyncHttpClient(base_url=BASE, max_retries=0)
+        await client.request("GET", "/v1/test", auth="none")
+        meta = client.last_response_meta
+        assert meta is not None
+        assert meta.credits_remaining == 42
+        assert meta.credits_charged == 2
+        await client.close()

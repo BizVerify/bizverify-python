@@ -51,20 +51,6 @@ def test_update_email(mock_api, sync_client):
     assert resp.message == "Success"
 
 
-def test_update_password(mock_api, sync_client):
-    mock_api.put("/v1/account/password").mock(return_value=httpx.Response(200, json=MESSAGE_RESPONSE))
-    resource = SyncAccountResource(sync_client)
-    resp = resource.update_password("oldpass", "newpass")
-    assert resp.message == "Success"
-
-
-def test_delete_account(mock_api, sync_client):
-    mock_api.delete("/v1/account").mock(return_value=httpx.Response(204))
-    resource = SyncAccountResource(sync_client)
-    result = resource.delete("mypassword")
-    assert result is None
-
-
 def test_create_key(mock_api, sync_client):
     mock_api.post("/v1/account/keys").mock(return_value=httpx.Response(200, json=CREATE_KEY_RESPONSE))
     resource = SyncAccountResource(sync_client)
@@ -80,9 +66,10 @@ def test_revoke_key(mock_api, sync_client):
     assert result is None
 
 
-def test_account_uses_jwt_auth(mock_api, sync_client):
+def test_account_uses_api_key_auth(mock_api, sync_client):
     def handler(request):
-        assert request.headers.get("Authorization") == "Bearer test-token"
+        assert request.headers.get("X-API-Key") == "test-key"
+        assert "Authorization" not in request.headers
         return httpx.Response(200, json=ACCOUNT_RESPONSE)
 
     mock_api.get("/v1/account").mock(side_effect=handler)

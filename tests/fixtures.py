@@ -2,28 +2,12 @@ from __future__ import annotations
 
 from typing import Any
 
-REGISTER_RESPONSE: dict[str, Any] = {
-    "user": {
-        "id": "550e8400-e29b-41d4-a716-446655440000",
-        "email": "test@example.com",
-        "email_verified": False,
-        "plan": "free",
-        "credit_balance": 100,
-        "created_at": "2026-01-01T00:00:00.000Z",
-    },
-    "api_key": "bv_live_abc123def456",
-}
+REQUEST_ACCESS_RESPONSE: dict[str, Any] = {"message": "Verification code sent to test@example.com"}
 
-LOGIN_RESPONSE: dict[str, Any] = {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test",
-    "user": {
-        "id": "550e8400-e29b-41d4-a716-446655440000",
-        "email": "test@example.com",
-        "email_verified": True,
-        "plan": "free",
-        "credit_balance": 100,
-        "created_at": "2026-01-01T00:00:00.000Z",
-    },
+VERIFY_ACCESS_RESPONSE: dict[str, Any] = {
+    "api_key": "bv_live_abc123def456",
+    "key_id": "key_001",
+    "label": "key-1710000000",
 }
 
 MESSAGE_RESPONSE: dict[str, Any] = {"message": "Success"}
@@ -187,6 +171,30 @@ CHECKER_RESPONSE: dict[str, Any] = {
     "query": "Acme",
     "jurisdiction": "us-fl",
     "total": 1,
+}
+
+CONFIG_RESPONSE: dict[str, Any] = {
+    "jurisdictions": {
+        "stats": {"totalJurisdictions": 61, "usStates": 50, "countries": 11},
+        "supported": {"us": ["us-fl"], "international": ["ee"], "comingSoon": []},
+    },
+    "checker": {"jurisdictions": [{"label": "Florida", "code": "us-fl"}]},
+    "pricing": {
+        "creditCosts": {"verify": 15, "search": 2},
+        "freeTier": {"credits": 50, "replenish": "never", "rateLimit": "10/min"},
+        "packages": [],
+    },
+    "features": {"verification": True, "search": True},
+    "rateLimits": {"default": 60},
+    "status": {"api": "operational", "lastUpdated": "2026-03-20T00:00:00Z"},
+    "legal": {"terms_url": "https://bizverify.co/terms", "privacy_url": "https://bizverify.co/privacy", "version": "1.0"},
+    "docs": {"openapi": "/v1/openapi.json", "interactive": "/docs"},
+}
+
+JURISDICTIONS_RESPONSE: dict[str, Any] = {
+    "jurisdictions": [
+        {"code": "us-fl", "name": "Florida", "features": {"search": True, "verify": True}},
+    ]
 }
 
 

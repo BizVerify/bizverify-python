@@ -10,11 +10,27 @@ pip install bizverify
 
 ## Quick Start
 
-### Verify a Business Entity
+### Authentication (Passwordless)
 
 ```python
 from bizverify import BizVerify
 
+client = BizVerify()
+
+# Request a verification code via email
+client.auth.request_access("you@example.com", accept_terms=True)
+
+# Verify the code — client is automatically configured with the new API key
+resp = client.auth.verify_access("you@example.com", "123456", label="my-agent")
+print(resp.api_key)  # Store this for future use
+
+# Or initialize with an existing API key
+client = BizVerify(api_key="bv_live_...")
+```
+
+### Verify a Business Entity
+
+```python
 client = BizVerify(api_key="bv_live_...")
 
 # Synchronous verification (cached result)
@@ -39,21 +55,30 @@ for result in client.search.find_all("Acme"):
     print(result.entity_name)
 ```
 
-### Authentication (JWT)
+### Response Metadata
+
+Every API call populates `last_response_meta` with credit and rate limit info:
 
 ```python
-client = BizVerify()
+result = client.verification.verify("Acme Inc", "us-fl")
+meta = client.last_response_meta
+print(meta.credits_remaining)    # 85
+print(meta.credits_charged)      # 15
+print(meta.rate_limit_remaining)  # 59
+```
 
-# Register
-reg = client.auth.register("user@example.com", "password123", accept_terms=True)
-print(reg.api_key)  # Store this
+### Configuration & Jurisdictions
 
-# Login (auto-stores JWT token)
-login = client.auth.login("user@example.com", "password123")
+```python
+# Get full API configuration (no auth required)
+config = client.config.get()
+print(config.pricing)
+print(config.jurisdictions)
 
-# Now JWT-authenticated endpoints work
-account = client.account.get()
-print(account.credit_balance)
+# List supported jurisdictions
+resp = client.config.jurisdictions()
+for j in resp.jurisdictions:
+    print(j.code, j.name, j.features)
 ```
 
 ### Async Client
@@ -96,12 +121,13 @@ except RateLimitError as e:
 
 | Resource | Methods |
 |----------|---------|
-| `client.auth` | `register()`, `login()`, `verify_email()`, `resend_verification()`, `forgot_password()`, `reset_password()` |
+| `client.auth` | `request_access()`, `verify_access()` |
 | `client.verification` | `verify()`, `verify_and_wait()`, `get_status()` |
 | `client.entities` | `get()`, `history()` |
 | `client.search` | `find()`, `find_all()` |
-| `client.account` | `get()`, `usage()`, `data_export()`, `update_email()`, `update_password()`, `delete()`, `create_key()`, `revoke_key()` |
+| `client.account` | `get()`, `usage()`, `data_export()`, `update_email()`, `create_key()`, `revoke_key()` |
 | `client.billing` | `get()`, `purchase()` |
+| `client.config` | `get()`, `jurisdictions()` |
 | `client.checker` | `check()` |
 
 ### Client Options
@@ -109,7 +135,6 @@ except RateLimitError as e:
 ```python
 client = BizVerify(
     api_key="bv_live_...",      # API key authentication
-    token="eyJ...",             # JWT authentication
     base_url="https://...",     # Custom base URL
     max_retries=2,              # Retry on 5xx (default: 2)
     timeout=30.0,               # Request timeout in seconds (default: 30)

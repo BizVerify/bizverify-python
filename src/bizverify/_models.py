@@ -81,23 +81,77 @@ class User:
 
 
 @dataclass(frozen=True)
-class RegisterResponse:
-    user: User
-    api_key: str
+class RequestAccessResponse:
+    message: str
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> RegisterResponse:
-        return cls(user=User.from_dict(data["user"]), api_key=data["api_key"])
+    def from_dict(cls, data: dict[str, Any]) -> RequestAccessResponse:
+        return cls(message=data["message"])
 
 
 @dataclass(frozen=True)
-class LoginResponse:
-    token: str
-    user: User
+class VerifyAccessResponse:
+    api_key: str
+    key_id: str
+    label: str
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> LoginResponse:
-        return cls(token=data["token"], user=User.from_dict(data["user"]))
+    def from_dict(cls, data: dict[str, Any]) -> VerifyAccessResponse:
+        return cls(api_key=data["api_key"], key_id=data["key_id"], label=data["label"])
+
+
+@dataclass(frozen=True)
+class ResponseMeta:
+    credits_remaining: int | None
+    credits_charged: int | None
+    rate_limit_limit: int | None
+    rate_limit_remaining: int | None
+    rate_limit_reset: int | None
+
+
+@dataclass(frozen=True)
+class ConfigResponse:
+    jurisdictions: dict[str, Any]
+    checker: dict[str, Any]
+    pricing: dict[str, Any]
+    features: dict[str, Any]
+    rate_limits: dict[str, Any]
+    status: dict[str, Any]
+    legal: dict[str, Any]
+    docs: dict[str, Any]
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> ConfigResponse:
+        return cls(
+            jurisdictions=data["jurisdictions"],
+            checker=data["checker"],
+            pricing=data["pricing"],
+            features=data["features"],
+            rate_limits=data["rateLimits"],
+            status=data["status"],
+            legal=data["legal"],
+            docs=data["docs"],
+        )
+
+
+@dataclass(frozen=True)
+class JurisdictionInfo:
+    code: str
+    name: str
+    features: dict[str, Any]
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> JurisdictionInfo:
+        return cls(code=data["code"], name=data["name"], features=data["features"])
+
+
+@dataclass(frozen=True)
+class JurisdictionsResponse:
+    jurisdictions: list[JurisdictionInfo]
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> JurisdictionsResponse:
+        return cls(jurisdictions=[JurisdictionInfo.from_dict(j) for j in data["jurisdictions"]])
 
 
 @dataclass(frozen=True)

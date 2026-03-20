@@ -12,7 +12,7 @@ BASE = "https://api.bizverify.co"
 
 def test_successful_get(mock_api, sync_client):
     mock_api.get("/v1/account").mock(return_value=httpx.Response(200, json={"id": "123"}))
-    result = sync_client.request("GET", "/v1/account", auth="jwt")
+    result = sync_client.request("GET", "/v1/account", auth="api_key")
     assert result == {"id": "123"}
 
 
@@ -23,8 +23,8 @@ def test_successful_post(mock_api, sync_client):
 
 
 def test_204_returns_none(mock_api, sync_client):
-    mock_api.delete("/v1/account").mock(return_value=httpx.Response(204))
-    result = sync_client.request("DELETE", "/v1/account", body={"password": "x"}, auth="jwt")
+    mock_api.delete("/v1/account/keys/k1").mock(return_value=httpx.Response(204))
+    result = sync_client.request("DELETE", "/v1/account/keys/k1", auth="api_key")
     assert result is None
 
 
@@ -33,7 +33,7 @@ def test_error_response(mock_api, sync_client):
         return_value=httpx.Response(400, json={"error": {"code": "VALIDATION_ERROR", "message": "Bad"}})
     )
     with pytest.raises(ValidationError) as exc_info:
-        sync_client.request("GET", "/v1/account", auth="jwt")
+        sync_client.request("GET", "/v1/account", auth="api_key")
     assert exc_info.value.code == "VALIDATION_ERROR"
 
 
@@ -83,17 +83,6 @@ def test_api_key_header(mock_api):
     client.close()
 
 
-def test_jwt_header(mock_api):
-    def handler(request):
-        assert request.headers["Authorization"] == "Bearer my-token"
-        return httpx.Response(200, json={})
-
-    mock_api.get("/v1/test").mock(side_effect=handler)
-    client = SyncHttpClient(base_url=BASE, token="my-token")
-    client.request("GET", "/v1/test", auth="jwt")
-    client.close()
-
-
 def test_no_auth_header(mock_api):
     def handler(request):
         assert "X-API-Key" not in request.headers
@@ -112,12 +101,7 @@ def test_query_params(mock_api, sync_client):
         return httpx.Response(200, json={})
 
     mock_api.get("/v1/account/usage").mock(side_effect=handler)
-    sync_client.request("GET", "/v1/account/usage", query={"days": "30"}, auth="jwt")
-
-
-def test_set_token(sync_client):
-    sync_client.set_token("new-token")
-    assert sync_client._token == "new-token"
+    sync_client.request("GET", "/v1/account/usage", query={"days": "30"}, auth="api_key")
 
 
 def test_set_api_key(sync_client):
@@ -130,3 +114,36 @@ def test_context_manager():
     with client as c:
         assert c is client
     # After exit, client should be closed (no assertion needed, just no error)
+
+
+def test_last_response_meta_populated(mock_api, sync_client):
+    headers = {
+        "x-credits-remaining": "85",
+        "x-credits-charged": "15",
+        "x-ratelimit-limit": "60",
+        "x-ratelimit-remaining": "59",
+        "x-ratelimit-reset": "1710000060",
+    }
+    mock_api.get("/v1/account").mock(return_value=httpx.Response(200, json={"id": "123"}, headers=headers))
+    sync_client.request("GET", "/v1/account", auth="api_key")
+    meta = sync_client.last_response_meta
+    assert meta is not None
+    assert meta.credits_remaining == 85
+    assert meta.credits_charged == 15
+    assert meta.rate_limit_limit == 60
+    assert meta.rate_limit_remaining == 59
+    assert meta.rate_limit_reset == 1710000060
+
+
+def test_last_response_meta_none_initially(sync_client):
+    assert sync_client.last_response_meta is None
+
+
+def test_last_response_meta_missing_headers(mock_api, sync_client):
+    mock_api.get("/v1/test").mock(return_value=httpx.Response(200, json={}))
+    sync_client.request("GET", "/v1/test", auth="none")
+    meta = sync_client.last_response_meta
+    assert meta is not None
+    assert meta.credits_remaining is None
+    assert meta.credits_charged is None
+    assert meta.rate_limit_limit is None
