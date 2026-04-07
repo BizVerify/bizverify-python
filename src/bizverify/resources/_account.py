@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from bizverify._models import Account, CreateKeyResponse, DataExport, MessageResponse, UsageStats
+from bizverify._models import Account, CreateKeyResponse, DataExport, UsageStats
 
 if TYPE_CHECKING:
     from bizverify._client import AsyncHttpClient, SyncHttpClient
@@ -27,9 +27,9 @@ class SyncAccountResource:
         data = self._client.request("GET", "/v1/account/data-export", auth="api_key")
         return DataExport.from_dict(data)  # type: ignore[arg-type]
 
-    def update_email(self, email: str) -> MessageResponse:
+    def update_email(self, email: str) -> Account:
         data = self._client.request("PATCH", "/v1/account", body={"email": email}, auth="api_key")
-        return MessageResponse.from_dict(data)  # type: ignore[arg-type]
+        return Account.from_dict(data)  # type: ignore[arg-type]
 
     def create_key(self, label: str) -> CreateKeyResponse:
         data = self._client.request("POST", "/v1/account/keys", body={"label": label}, auth="api_key")
@@ -58,9 +58,9 @@ class AsyncAccountResource:
         data = await self._client.request("GET", "/v1/account/data-export", auth="api_key")
         return DataExport.from_dict(data)  # type: ignore[arg-type]
 
-    async def update_email(self, email: str) -> MessageResponse:
+    async def update_email(self, email: str) -> Account:
         data = await self._client.request("PATCH", "/v1/account", body={"email": email}, auth="api_key")
-        return MessageResponse.from_dict(data)  # type: ignore[arg-type]
+        return Account.from_dict(data)  # type: ignore[arg-type]
 
     async def create_key(self, label: str) -> CreateKeyResponse:
         data = await self._client.request("POST", "/v1/account/keys", body={"label": label}, auth="api_key")
