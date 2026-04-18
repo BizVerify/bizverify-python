@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable
 
-from bizverify._models import JobStatusResponse, VerifyResponse
+from bizverify._models import JobStatusResponse, VerificationLevel, VerifyResponse
 from bizverify._polling import async_poll_until_complete, poll_until_complete
 
 if TYPE_CHECKING:
@@ -19,7 +19,7 @@ class SyncVerificationResource:
         jurisdiction: str,
         *,
         entity_type: str | None = None,
-        verification_level: str | None = None,
+        verification_level: VerificationLevel | None = None,
         force_refresh: bool | None = None,
         webhook_url: str | None = None,
     ) -> VerifyResponse:
@@ -41,7 +41,7 @@ class SyncVerificationResource:
         jurisdiction: str,
         *,
         entity_type: str | None = None,
-        verification_level: str | None = None,
+        verification_level: VerificationLevel | None = None,
         force_refresh: bool | None = None,
         webhook_url: str | None = None,
         poll_interval: float = 2.0,
@@ -73,7 +73,7 @@ class AsyncVerificationResource:
         jurisdiction: str,
         *,
         entity_type: str | None = None,
-        verification_level: str | None = None,
+        verification_level: VerificationLevel | None = None,
         force_refresh: bool | None = None,
         webhook_url: str | None = None,
     ) -> VerifyResponse:
@@ -95,7 +95,7 @@ class AsyncVerificationResource:
         jurisdiction: str,
         *,
         entity_type: str | None = None,
-        verification_level: str | None = None,
+        verification_level: VerificationLevel | None = None,
         force_refresh: bool | None = None,
         webhook_url: str | None = None,
         poll_interval: float = 2.0,

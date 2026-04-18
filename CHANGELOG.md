@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0 (2026-04-18)
+
+- BREAKING: `verification_level` values renamed `pre_check` → `quick`, `full` → `deep`. Wire format JSON field name is unchanged; only the string values differ.
+- Added `VerificationLevel` typed `Literal["quick", "deep"]` alias, exported from the top-level package.
+- `verification.verify()` and `verification.verify_and_wait()` (sync + async) now accept `verification_level: VerificationLevel | None` for improved type-checker support.
+
 ## 0.1.0 (2026-03-23)
 
 - Initial release

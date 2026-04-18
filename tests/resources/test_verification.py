@@ -28,7 +28,7 @@ def test_verify_with_optional_params(mock_api, sync_client):
         import json
         body = json.loads(request.content)
         assert body["entity_type"] == "llc"
-        assert body["verification_level"] == "full"
+        assert body["verification_level"] == "deep"
         assert body["force_refresh"] is True
         assert body["webhook_url"] == "https://example.com/hook"
         return httpx.Response(200, json=VERIFY_RESPONSE_SYNC)
@@ -37,7 +37,7 @@ def test_verify_with_optional_params(mock_api, sync_client):
     resource = SyncVerificationResource(sync_client)
     resource.verify(
         "Acme Inc", "us-fl",
-        entity_type="llc", verification_level="full",
+        entity_type="llc", verification_level="deep",
         force_refresh=True, webhook_url="https://example.com/hook",
     )
 

@@ -47,6 +47,7 @@ from bizverify._models import (
     UsageEntry,
     UsageStats,
     User,
+    VerificationLevel,
     VerifyAccessResponse,
     VerifyResponse,
 )
@@ -180,4 +181,5 @@ __all__ = [
     "PurchaseResponse",
     "CheckerResult",
     "CheckerResponse",
+    "VerificationLevel",
 ]
