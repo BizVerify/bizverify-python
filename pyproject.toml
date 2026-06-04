@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "bizverify"
 version = "0.2.0"
-description = "Official Python SDK for the BizVerify API — verify business entities against official government registries (Secretary of State, Companies House). Built for the US and Europe."
+description = "Official Python SDK for the BizVerify API — verify business entities against official government registries (Secretary of State, Companies House) across the US and Europe."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
