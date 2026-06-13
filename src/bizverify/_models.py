@@ -166,6 +166,16 @@ class MessageResponse:
 
 
 @dataclass(frozen=True)
+class VerificationReason:
+    code: str
+    message: str
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> VerificationReason:
+        return cls(code=data["code"], message=data["message"])
+
+
+@dataclass(frozen=True)
 class VerifyResponse:
     status: str
     data: Any
@@ -173,6 +183,9 @@ class VerifyResponse:
     entity_id: str | None
     cached: bool
     credits_charged: int
+    verification_level: str | None = None
+    full_verification_available: bool | None = None
+    reason: VerificationReason | None = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> VerifyResponse:
@@ -183,6 +196,9 @@ class VerifyResponse:
             entity_id=data.get("entity_id"),
             cached=data["cached"],
             credits_charged=data["credits_charged"],
+            verification_level=data.get("verification_level"),
+            full_verification_available=data.get("full_verification_available"),
+            reason=VerificationReason.from_dict(data["reason"]) if data.get("reason") else None,
         )
 
 
@@ -231,6 +247,8 @@ class Entity:
     filing_history_summary: list[FilingSummary]
     created_at: str
     updated_at: str
+    last_verified_at: str | None = None
+    snapshots: int | None = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Entity:
@@ -253,6 +271,8 @@ class Entity:
             filing_history_summary=filings,
             created_at=data["created_at"],
             updated_at=data["updated_at"],
+            last_verified_at=data.get("last_verified_at"),
+            snapshots=data.get("snapshots"),
         )
 
 
