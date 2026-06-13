@@ -79,6 +79,55 @@ ENTITY_RESPONSE: dict[str, Any] = {
     "updated_at": "2026-01-01T00:00:00.000Z",
 }
 
+# Canonical unwrapped, deep-shaped GET /v1/entity/:id response (API contract reconciliation).
+ENTITY_RESPONSE_FULL: dict[str, Any] = {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "jurisdiction": "us-fl",
+    "jurisdiction_id": "L21000098765",
+    "entity_name": "ACME WIDGETS LLC",
+    "entity_type": "llc",
+    "status": "active",
+    "good_standing": True,
+    "formation_date": "2021-03-15",
+    "registered_agent": {
+        "name": "JANE AGENT",
+        "address": {
+            "line1": "100 AGENT WAY",
+            "line2": None,
+            "city": "TALLAHASSEE",
+            "state": "FL",
+            "postal_code": "32301",
+            "country": "US",
+        },
+    },
+    "officers": [{"name": "JOHN DOE", "title": "Manager", "address": None}],
+    "principal_address": {
+        "line1": "200 COMMERCE BLVD",
+        "line2": "SUITE 400",
+        "city": "MIAMI",
+        "state": "FL",
+        "postal_code": "33131",
+        "country": "US",
+    },
+    "filing_history_summary": [{"date": "2024-01-10", "type": "ANNUAL REPORT", "description": None}],
+    "last_verified_at": "2026-06-13T10:30:00.000Z",
+    "snapshots": 3,
+    "created_at": "2024-01-05T08:00:00.000Z",
+    "updated_at": "2026-06-13T10:30:00.000Z",
+}
+
+# Verify response carrying the verification-tier fields (divergence G).
+VERIFY_RESPONSE_TIERED: dict[str, Any] = {
+    "status": "completed",
+    "data": {"exists": True},
+    "entity_id": "ent_123",
+    "cached": False,
+    "credits_charged": 1,
+    "verification_level": "quick",
+    "full_verification_available": True,
+    "reason": {"code": "QUICK_MATCH", "message": "Matched on name and jurisdiction"},
+}
+
 HISTORY_RESPONSE: dict[str, Any] = {
     "snapshots": [{"id": "snap_1", "data": {}}],
     "total": 1,
